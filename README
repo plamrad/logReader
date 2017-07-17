@@ -1,0 +1,5 @@
+-- Tested with PHP version 5.6.30 --
+CLI "php Helper/createLogFile.php"
+    "php index.php"
+BROWSER "/Helper/visualizeLogs.php"
+    
