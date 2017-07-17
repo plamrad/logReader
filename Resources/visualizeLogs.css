@@ -1,0 +1,54 @@
+/* 
+    Created on : 17-Jul-2017, 13:46:39
+    Author     : Plam Radu <plamrad@gmail.com>
+*/
+
+.log_box {
+    position: relative;
+    margin-bottom: 1px;
+    padding: 3px;
+    height: 13px;
+    /*border: 1px solid #888;*/
+    font-size: 9px;
+    /*background-color: #e8e8e8;*/
+    background-color:rgba(0,0,0,0.3);
+}
+
+.hightlight_box {
+    /*border: 1px solid red;*/
+    background-color: pink;
+}
+
+.mouseover {
+    background-color:rgba(0,0,0,0.9);
+}
+
+.log_box_info {
+    position: relative;
+    width: 150px
+}
+
+#vertical_line {
+    position: absolute;
+    height: 2000px;
+    width: 0px;
+    border-left: 1px solid black;
+}
+
+#vertical_line_position_info {
+    position: fixed;
+    top: 0;
+    right: 0;
+}
+
+#ts_clicked_info {
+    position: fixed;
+    top: 20px;
+    right: 0;
+}
+
+#logPeak_info {
+    position: fixed;
+    top: 40px;
+    right: 0;
+}
