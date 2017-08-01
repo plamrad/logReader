@@ -17,16 +17,9 @@ $(document).ready(function(){
         vertical_x = e.pageX;
     });
 
-    $(document).on('mouseover', '.log_box', function () {
-        $(this).addClass('mouseover');
-    });
-
-    $(document).on('mouseout', '.log_box', function () {
-        $(this).removeClass('mouseover');
-    });
 
     $(document).on('click', '.log_box', function () {
-        $('#ts_clicked_info').text('ts: ' + vertical_x);
+        $('#ts_clicked_info').text('ts: ' + ((initialStartTime - 128) + vertical_x));
 
         var highlight_count = 0;
         $('.log_box').removeClass('highlight_box');
