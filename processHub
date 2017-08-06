@@ -1,0 +1,107 @@
+<?php
+$fl_key = 'lastname';
+//$fl_key = 'email';
+$sourceFile = 'hubspot-membri-export.csv';
+$outputFile = 'result_hub_membri.csv';
+
+function transliterate($string) {
+    $utf = array(
+        'à' => 'a', 'î' => 'i', 'ă' => 'a', 'â' => 'a', 'ô' => 'o', 'ď' => 'd',
+        'ḟ' => 'f', 'ë' => 'e', 'š' => 's', 'ơ' => 'o', 'ß' => 'ss', 'ă' => 'a', 'ř' => 'r', 'ț' => 't',
+        'ň' => 'n', 'ā' => 'a', 'ķ' => 'k',
+        'ŝ' => 's', 'ỳ' => 'y', 'ņ' => 'n', 'ĺ' => 'l', 'ħ' => 'h', 'ṗ' => 'p', 'ó' => 'o', 'ú' => 'u',
+        'ě' => 'e', 'é' => 'e', 'ç' => 'c', 'ẁ' => 'w', 'ċ' => 'c', 'õ' => 'o',
+        'ṡ' => 's', 'ø' => 'o', 'ģ' => 'g', 'ŧ' => 't', 'ș' => 's', 'ė' => 'e', 'ĉ' => 'c', 'ś' => 's',
+        'î' => 'i', 'ű' => 'u', 'ć' => 'c', 'ę' => 'e', 'ŵ' => 'w', 'ṫ' => 't',
+        'ū' => 'u', 'č' => 'c', 'ö' => 'o', 'è' => 'e', 'ŷ' => 'y', 'ą' => 'a', 'ł' => 'l', 'ų' => 'u',
+        'ů' => 'u', 'ş' => 's', 'ğ' => 'g', 'ļ' => 'l', 'ƒ' => 'f', 'ž' => 'z',
+        'ẃ' => 'w', 'ḃ' => 'b', 'å' => 'a', 'ì' => 'i', 'ï' => 'i', 'ḋ' => 'd', 'ť' => 't', 'ŗ' => 'r',
+        'ä' => 'a', 'í' => 'i', 'ŕ' => 'r', 'ê' => 'e', 'ü' => 'u', 'ò' => 'o',
+        'ē' => 'e', 'ñ' => 'n', 'ń' => 'n', 'ĥ' => 'h', 'ĝ' => 'g', 'đ' => 'd', 'ĵ' => 'j', 'ÿ' => 'y',
+        'ũ' => 'u', 'ŭ' => 'u', 'ư' => 'u', 'ţ' => 't', 'ý' => 'y', 'ő' => 'o',
+        'â' => 'a', 'ľ' => 'l', 'ẅ' => 'w', 'ż' => 'z', 'ī' => 'i', 'ã' => 'a', 'ġ' => 'g', 'ṁ' => 'm',
+        'ō' => 'o', 'ĩ' => 'i', 'ù' => 'u', 'į' => 'i', 'ź' => 'z', 'á' => 'a',
+        'û' => 'u', 'þ' => 'th', 'ð' => 'dh', 'æ' => 'ae', 'µ' => 'u', 'ĕ' => 'e', 'ı' => 'i',
+        'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A', 'Ç' => 'C',
+        'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ì' => 'I', 'Í' => 'I',
+        'Î' => 'I', 'Ï' => 'I', 'Ñ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O',
+        'Õ' => 'O', 'Ö' => 'O', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'U',
+        'Ý' => 'Y', 'Î' => 'I', 'Ș' => 'S', 'Ț' => 'T', 'Â' => 'A', 'Ă' => 'A'
+    );
+
+    $out = str_replace(array_keys($utf), array_values($utf), $string);
+
+    return $out;
+}
+
+function cleanNames($name) {
+    $name = str_replace(" - ", '-', $name);
+    $name = str_replace("- ", '-', $name);
+    $name = str_replace(" -", '-', $name);
+    $name = str_replace("-", '   ', $name);
+    $name = ucwords(strtolower($name));
+
+    return str_replace('   ', '-', $name);
+}
+
+function getLastNameLastPart($name) {
+    $name = str_replace("-", ' ', $name);
+    $parts = explode(' ', $name);
+    
+    $name = array_pop($parts);
+    
+    return $name;
+}
+
+$i = 1;
+$check_last_name_count = [];
+$check_last_name_count = [];
+$arr_bad_emails = [];
+
+$handle = fopen($sourceFile, 'r');
+while (($line = fgetcsv($handle)) !== FALSE) {
+    $email = $line[4];
+    $first_name = $line[0];
+    $last_name = $line[1];
+
+    $last_name = cleanNames($last_name);
+    $clean_last_name = transliterate($last_name);
+    $clean_last_name = getLastNameLastPart($clean_last_name);
+
+    $last_name_count = 0;
+    if (isset($check_last_name_count[$clean_last_name])) {
+        $last_name_count = $check_last_name_count[$clean_last_name] = $check_last_name_count[$clean_last_name] + 1;
+    } else {
+        $last_name_count = $check_last_name_count[$clean_last_name] = 1;
+    }
+
+    if ($fl_key == 'lastname') {
+        $key = strtolower($clean_last_name).$last_name_count;
+    } elseif($fl_key == 'email') {
+        $key = $email;
+    } else {
+        die("\nGIVE ME A KEY\n");
+    }
+
+    if (strlen(trim($email)) > 0 && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $arr_hub[$key] = $key.','. $email . ',' . cleanNames($first_name . ' ' . $last_name);
+    } else {
+        $arr_bad_emails[$key] = $key.','. $email . ',' . cleanNames($first_name . ' ' . $last_name);
+    }
+
+    $i++;
+    
+}
+ksort($arr_hub);
+$string = '';
+
+foreach ($arr_hub as $key => $value) {
+    $string .= $value . "\n";
+}
+
+$string = trim($string);
+if (is_file($outputFile)) {
+    unlink($outputFile);
+}
+
+file_put_contents($outputFile, $string, FILE_APPEND);
